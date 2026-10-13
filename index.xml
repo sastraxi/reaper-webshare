@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="webshare" commit="8d9abbbe810b0f9ec9e68f8f957a24392954f984">
+<index version="1" name="webshare" commit="8fda8de41bb3d119b4618b85d6423250091f7988">
   <category name="Rendering">
     <reapack name="Webshare - Export stems.lua" type="script" desc="Webshare: Export stems">
       <metadata>
@@ -9,7 +9,7 @@
 
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Webshare: Export stems\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Export the time selection as individual stems plus one combined mix. Top-level tracks are exported by default; toggle any track in the panel. Optionally writes a Markdown export log (YAML front matter) next to the files.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 {\b Requires ReaImGui} (ReaTeam Extensions repository). Restart REAPER after installing it.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Requires ReaImGui and js_ReaScriptAPI} (both in the ReaTeam Extensions repository). Restart REAPER after installing them.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 How to use\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Actions \u8594 ? Show action list..., filter {\f1 webshare}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Run {\b Script: Webshare - Export stems.lua} to open the panel\par}
@@ -63,6 +63,20 @@ versions, or js_ReaScriptAPI's if it's installed.]]></changelog>
         <source file="lib/selection.lua">https://github.com/sastraxi/reaper-webshare/raw/8d9abbbe810b0f9ec9e68f8f957a24392954f984/Rendering/lib/selection.lua</source>
         <source file="lib/tracks.lua">https://github.com/sastraxi/reaper-webshare/raw/8d9abbbe810b0f9ec9e68f8f957a24392954f984/Rendering/lib/tracks.lua</source>
         <source file="lib/ui.lua">https://github.com/sastraxi/reaper-webshare/raw/8d9abbbe810b0f9ec9e68f8f957a24392954f984/Rendering/lib/ui.lua</source>
+      </version>
+      <version name="0.4.0" author="sastraxi" time="2026-10-13T03:57:14Z">
+        <changelog><![CDATA[The panel now requires js_ReaScriptAPI as well as ReaImGui (for the export folder
+picker). If either is missing, it offers to open ReaPack on it.]]></changelog>
+        <source main="main">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/Webshare%20-%20Export%20stems.lua</source>
+        <source main="main" file="Webshare - Export stems now (no window).lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/Webshare%20-%20Export%20stems%20now%20(no%20window).lua</source>
+        <source main="main" file="Webshare - Toggle selected tracks for export.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/Webshare%20-%20Toggle%20selected%20tracks%20for%20export.lua</source>
+        <source file="lib/changelog.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/changelog.lua</source>
+        <source file="lib/export.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/export.lua</source>
+        <source file="lib/layout.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/layout.lua</source>
+        <source file="lib/render.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/render.lua</source>
+        <source file="lib/selection.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/selection.lua</source>
+        <source file="lib/tracks.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/tracks.lua</source>
+        <source file="lib/ui.lua">https://github.com/sastraxi/reaper-webshare/raw/8fda8de41bb3d119b4618b85d6423250091f7988/Rendering/lib/ui.lua</source>
       </version>
     </reapack>
   </category>
