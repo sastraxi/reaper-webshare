@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="webshare" commit="46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c">
+<index version="1" name="webshare" commit="7a4fc63b3dcfa1ed347d221d957fc9bdee2a2778">
   <category name="Rendering">
     <reapack name="webshare_Stem export.lua" type="script" desc="Stem export">
       <metadata>
@@ -7,7 +7,14 @@
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 Export the time selection as individual stems plus one combined mix. Top-level tracks are exported by default; toggle any track in the panel. Optionally writes a Markdown export log (YAML front matter) next to the files. Requires ReaImGui (ReaTeam Extensions repository).\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Stem export\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Export the time selection as individual stems plus one combined mix. Top-level tracks are exported by default; toggle any track in the panel. Optionally writes a Markdown export log (YAML front matter) next to the files.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Requires ReaImGui} (ReaTeam Extensions repository). Restart REAPER after installing it.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 How to use\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Actions \u8594 ? Show action list..., filter {\f1 stem}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Run {\b Script: webshare_Stem export.lua} to open the panel\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Make a time selection, check the ticks, click {\b Export}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Files go to {\f1 Exports/<project>/<date time>/} next to the project file. Full documentation: https://github.com/sastraxi/reaper-webshare\par}
 }
 ]]></description>
         <link rel="website">https://github.com/sastraxi/reaper-webshare</link>
