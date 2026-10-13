@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="webshare" commit="62a8b6145985015d69a693f6900643054c9113fe">
+<index version="1" name="webshare" commit="0183d71cddb8394bfe229f41074973acd0252794">
   <category name="Rendering">
     <reapack name="Webshare - Export stems.lua" type="script" desc="Webshare: Export stems">
       <metadata>
@@ -14,7 +14,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Actions \u8594 ? Show action list..., filter {\f1 webshare}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Run {\b Script: Webshare - Export stems.lua} to open the panel\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Make a time selection, check the ticks, click {\b Export}\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Files go to {\f1 Exports/<project>/<date time>/} next to the project file. Full documentation: https://github.com/sastraxi/reaper-webshare\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Files go to {\f1 <export folder>/<project>/<date time>/}. Set the export folder at the top of the panel; if it's empty, they go to {\f1 Exports/} next to the project file. Full documentation: https://github.com/sastraxi/reaper-webshare\par}
 }
 ]]></description>
         <link rel="website">https://github.com/sastraxi/reaper-webshare</link>
@@ -34,6 +34,22 @@ Panel: no more stray scrollbar; time selection shown as clock time and bars.]]><
         <source file="lib/selection.lua">https://github.com/sastraxi/reaper-webshare/raw/62a8b6145985015d69a693f6900643054c9113fe/Rendering/lib/selection.lua</source>
         <source file="lib/tracks.lua">https://github.com/sastraxi/reaper-webshare/raw/62a8b6145985015d69a693f6900643054c9113fe/Rendering/lib/tracks.lua</source>
         <source file="lib/ui.lua">https://github.com/sastraxi/reaper-webshare/raw/62a8b6145985015d69a693f6900643054c9113fe/Rendering/lib/ui.lua</source>
+      </version>
+      <version name="0.3.0" author="sastraxi" time="2026-10-13T03:45:20Z">
+        <changelog><![CDATA[Shared export folder: set once at the top of the panel and it applies to every
+project. Exports go to <folder>/<project name>/<date time>/. Leave it empty to keep
+exporting next to each project. Browse uses REAPER's folder picker on newer REAPER
+versions, or js_ReaScriptAPI's if it's installed.]]></changelog>
+        <source main="main">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/Webshare%20-%20Export%20stems.lua</source>
+        <source main="main" file="Webshare - Export stems now (no window).lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/Webshare%20-%20Export%20stems%20now%20(no%20window).lua</source>
+        <source main="main" file="Webshare - Toggle selected tracks for export.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/Webshare%20-%20Toggle%20selected%20tracks%20for%20export.lua</source>
+        <source file="lib/changelog.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/changelog.lua</source>
+        <source file="lib/export.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/export.lua</source>
+        <source file="lib/layout.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/layout.lua</source>
+        <source file="lib/render.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/render.lua</source>
+        <source file="lib/selection.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/selection.lua</source>
+        <source file="lib/tracks.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/tracks.lua</source>
+        <source file="lib/ui.lua">https://github.com/sastraxi/reaper-webshare/raw/0183d71cddb8394bfe229f41074973acd0252794/Rendering/lib/ui.lua</source>
       </version>
     </reapack>
   </category>
