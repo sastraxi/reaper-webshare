@@ -1,0 +1,141 @@
+# AGENTS.md
+
+Guidance for coding agents working in this repo. Human-oriented docs are in `README.md`.
+
+## What this is
+
+A REAPER ReaScript package (Lua 5.4 + ReaImGui, distributed via ReaPack) that renders the
+**time selection** as one file per exported track ("stems") plus one **combined mix**, in a
+single render pass. It must run unchanged on Windows, macOS and Linux.
+
+## Product rules (agreed with the user; don't change without asking)
+
+- **Which tracks export:** every top-level track (`GetTrackDepth == 0`) by default; nested
+  tracks don't. One boolean per track, no tri-state modes. Users override either way.
+- **Overrides** are stored in `P_EXT:webshare:stem` (`"1"`/`"0"`, absent = default).
+  Store an override only when it differs from the default (`selection.override_for`), so
+  tracks keep following the default until a user deviates.
+- **Overlap is allowed:** a folder and a child of that folder may both be stems.
+- **Stems skip master FX; the combined mix keeps them.** Stems include the track's own FX
+  chain (including instrument plugins) and, for folders, all children. Sends to buses
+  outside the track are *not* in its stem: single-pass for now, by user decision.
+- **Excluded top-level tracks are left out of the combined mix.** Done by temporarily
+  setting `B_MAINSEND = 0`, never by muting.
+- **Mute is respected, files are always written.** Warn when a stem or any of its
+  descendants is muted. Never warn about muted tracks that aren't rendered.
+- **Output layout:** one folder per project, one per export. The project is the top
+  level, and only the per-track files are called stems:
+  ```
+  <project dir>/Exports/<project name>/<YYYY-MM-DD HHMMSS>/
+    export.md          (if the log is on)
+    Master.<ext>       combined mix
+    stems/<track>.<ext>
+  ```
+  REAPER renders flat, then `lib/export.lua` moves the stems as planned by `lib/layout.lua`.
+  If the targets can't be matched to tracks, nothing is moved.
+- **Export log (optional, per project, off by default):** when enabled, every export
+  writes `export.md` into its folder. That file has YAML front matter (title, date,
+  project, time selection, mix + stems with file names and loudness stats, muted
+  descendants, excluded tracks, REAPER version) and the user's notes as the body. The
+  first line of the notes becomes the title. It's meant to be consumed by an external
+  static site (e.g. Eleventy); this repo doesn't build the site.
+
+## Layout
+
+```
+Scripts/webshare/
+  webshare_Stem export.lua                           ReaPack package file + panel action
+  webshare_Export stems.lua                          headless export action
+  webshare_Toggle stem export for selected tracks.lua
+  lib/selection.lua   pure logic: defaults, overrides, plan, warnings. NO reaper.* calls
+  lib/layout.lua      pure logic: match render targets to tracks, plan moves into stems/
+  lib/changelog.lua   pure logic: RENDER_STATS parsing, export.md generation. NO reaper.*
+  lib/tracks.lua      reads project into snapshots; writes overrides (with undo)
+  lib/render.lua      configures render, runs action 42230, restores state
+  lib/export.lua      render, move stems, optional log; the entry point both actions use
+  lib/ui.lua          ReaImGui panel (API pinned via require 'imgui' '0.9')
+tests/*_test.lua           plain-Lua tests for the pure modules (tests/harness.lua)
+tools/dev-link.{sh,ps1}    link Scripts/webshare into REAPER's resource folder
+tools/probe_render.lua     run inside REAPER: real export into out/ + probe.log of what
+                           REAPER reported. Use it to check assumptions against a real install
+```
+
+Entry scripts put their own directory on `package.path` and `require 'lib.x'`. Keep that
+pattern, because REAPER runs each script with its own working directory and Lua state.
+
+## Conventions
+
+- Keep decision logic in the pure modules (`selection`, `layout`, `changelog`) and test it there.
+  REAPER-facing modules should stay thin adapters.
+- Code must run on Lua 5.4 (REAPER) *and* 5.5. For example, don't assign to `for` loop
+  variables, which are constants in 5.5.
+- Anything that changes project state temporarily (render settings, selection,
+  `B_MAINSEND`) must be saved first and restored even on error (`pcall`), as `render.lua`
+  does.
+- User-visible track changes go through `tracks.apply` (one undo point per action).
+  Scripts that change nothing call `reaper.defer(function() end)` so they don't create an
+  empty undo point.
+- Paths: build with `package.config:sub(1,1)` as the separator, or let REAPER resolve
+  them. No shelling out, because it isn't portable.
+- Preserve the user's unrelated `RENDER_SETTINGS` bits (format, metadata, 2nd pass).
+  Only clear and set `SOURCE_BITS`.
+- Match the existing style: 2-space indent, single quotes, short comments that explain
+  *why*.
+
+## Render API facts used
+
+From the ReaScript docs (`GetSetProjectInfo`):
+- `RENDER_SETTINGS`: `&1` stems+master mix, `&2` stems only, `&128` selected tracks
+  *via master* (we must NOT set this one), `&8192` pre-fader stems.
+- `RENDER_BOUNDSFLAG`: `2` = time selection. `RENDER_ADDTOPROJ`: `&1` add to project.
+- `RENDER_FILE` = output directory, `RENDER_PATTERN` = file name pattern (`$track`).
+- `RENDER_TARGETS` = `;`-separated paths that the current settings will write.
+- `RENDER_STATS` (read after rendering) =
+  `FILE:<path>;PEAK:..;LUFSMMAX:..;LUFSSMAX:..;LUFSI:..;LRA:..;FILE:...`.
+  `RENDER_STATS_SUMMARY` came back empty, so parse the raw string.
+- Action `42230`: render with the most recent settings, auto-closing the dialog.
+
+The reference docs (https://reaper.fm/sdk/reascript/reascripthelp.html) were generated for
+REAPER 7.82. The user develops on **7.33**, so check that any newer flag exists there.
+
+## Verified with tools/probe_render.lua (REAPER 7.33, macOS arm64, 2026-10-12)
+
+- `Main_OnCommand(42230)` blocks until the render finishes, and the files exist on return.
+- With stems + master mix and `$track`, the mix is named `Master.<ext>`. `RENDER_TARGETS`
+  lists it first, then one file per stem in track order. `lib/layout.match_files`
+  relies on that order. A stem named "Master" would overwrite the mix file, so
+  `selection.plan` reports it as a duplicate.
+- `RENDER_STATS` holds peak/LUFS/LRA after an ordinary render, with no dry run needed.
+  This was with the user's prefs (`renderclosewhendone=4`); other render-statistics
+  prefs are untested.
+- The file format follows the user's Render dialog (mp3 in that test).
+- Full path end-to-end: render → stems moved into `stems/` → `export.md` with stats matched
+  to the right files.
+- `RENDER_STATS` still holds the *previous* render's stats until a new render finishes.
+  This is harmless because each export goes into a new folder and stats are looked up by path.
+
+## Not yet verified inside REAPER
+
+Treat these as assumptions until someone confirms them by hand, and update this list:
+- What `$track` produces for unnamed tracks (`selection.display_name` assumes "Track N").
+- How `RENDER_TARGETS` looks with a secondary render format on. `match_files` then gives up:
+  nothing moves into `stems/` and the log writes `file: null`.
+- The ReaImGui 0.9 calls in `lib/ui.lua` (`BeginChild`/`EndChild` pairing especially).
+  ReaImGui wasn't installed on the dev machine when this was written.
+- Windows and Linux in general.
+
+## Testing
+
+- From the repo root: `for t in tests/*_test.lua; do lua "$t"; done`. Run them with Lua 5.4
+  (REAPER's version: `brew install lua@5.4`, keg-only at `$(brew --prefix lua@5.4)/bin/lua`)
+  as well as current Lua. Optional lint: `luacheck Scripts tests tools`.
+- Everything else needs REAPER. Run `tools/dev-link.sh` once, load the actions through
+  *Actions → New action → Load ReaScript*, then test against a real project. You can't
+  drive REAPER from here, so state clearly what you couldn't verify.
+
+## Releasing
+
+ReaPack reads the metadata header in `webshare_Stem export.lua`. Bump `@version` there and
+generate `index.xml` with `reapack-index` (Ruby gem). The other scripts are `@noindex` and
+ship through its `@provides` list. ReaPack can't declare dependencies, so the panel checks
+for ReaImGui at runtime.

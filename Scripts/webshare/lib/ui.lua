@@ -1,0 +1,162 @@
+-- Dockable ReaImGui panel: track tree with export checkboxes, mute warnings, Export button.
+
+local selection = require 'lib.selection'
+local tracks_mod = require 'lib.tracks'
+local export = require 'lib.export'
+
+local M = {}
+
+local TITLE = 'Stem Export'
+local INDENT = 16
+local COLOR_WARN = 0xF0A030FF
+local NOTES_HEIGHT = 64
+
+local function load_imgui()
+  if not reaper.ImGui_GetBuiltinPath then
+    return nil
+  end
+  package.path = reaper.ImGui_GetBuiltinPath() .. '/?.lua;' .. package.path
+  return require 'imgui' '0.9'
+end
+
+local function names(list)
+  local out = {}
+  for _, t in ipairs(list) do
+    out[#out + 1] = selection.display_name(t)
+  end
+  return table.concat(out, '\n')
+end
+
+function M.run()
+  local ImGui = load_imgui()
+  if not ImGui then
+    reaper.MB('This script needs ReaImGui. Install it with ReaPack (ReaTeam Extensions repository).', TITLE, 0)
+    return
+  end
+
+  local ctx = ImGui.CreateContext(TITLE)
+  local status
+  local notes = ''
+  local export_requested = false
+
+  local function draw_track(t, warning)
+    ImGui.PushID(ctx, t.guid)
+    if t.depth > 0 then
+      ImGui.Indent(ctx, t.depth * INDENT)
+    end
+
+    local changed, exported = ImGui.Checkbox(ctx, selection.display_name(t), selection.is_exported(t))
+    if changed then
+      tracks_mod.apply({ { track = t, exported = exported } }, 'Stem export: toggle track')
+    end
+
+    if t.override ~= nil then
+      ImGui.SameLine(ctx)
+      if ImGui.SmallButton(ctx, 'reset') then
+        tracks_mod.apply({ { track = t, exported = nil } }, 'Stem export: reset track')
+      end
+      if ImGui.IsItemHovered(ctx) then
+        ImGui.SetTooltip(ctx, 'Return to the default (top-level tracks export, nested tracks don\'t)')
+      end
+    end
+
+    if warning then
+      ImGui.SameLine(ctx)
+      ImGui.TextColored(ctx, COLOR_WARN, '(muted)')
+      if ImGui.IsItemHovered(ctx) then
+        ImGui.SetTooltip(ctx, 'Muted tracks will affect this stem:\n' .. names(warning.muted))
+      end
+    end
+
+    if t.depth > 0 then
+      ImGui.Unindent(ctx, t.depth * INDENT)
+    end
+    ImGui.PopID(ctx)
+  end
+
+  local function draw_footer(plan)
+    ImGui.Separator(ctx)
+
+    local start, finish = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
+    if finish > start then
+      ImGui.Text(ctx, ('Time selection: %s – %s'):format(
+        reaper.format_timestr_pos(start, '', -1), reaper.format_timestr_pos(finish, '', -1)))
+    else
+      ImGui.TextColored(ctx, COLOR_WARN, 'No time selection')
+    end
+
+    ImGui.Text(ctx, ('%d stem(s) + combined mix'):format(#plan.stems))
+    if #plan.duplicate_names > 0 then
+      ImGui.SameLine(ctx)
+      ImGui.TextColored(ctx, COLOR_WARN, '(duplicate names)')
+      if ImGui.IsItemHovered(ctx) then
+        ImGui.SetTooltip(ctx, 'These stems share a name and will overwrite each other:\n'
+          .. table.concat(plan.duplicate_names, '\n'))
+      end
+    end
+
+    local log_changed, log_on = ImGui.Checkbox(ctx, 'Write export log (export.md)', export.log_enabled())
+    if log_changed then
+      export.set_log_enabled(log_on)
+    end
+    if log_on then
+      ImGui.TextDisabled(ctx, 'Notes (first line becomes the title):')
+      notes = select(2, ImGui.InputTextMultiline(ctx, '##notes', notes, -1, NOTES_HEIGHT))
+    end
+
+    if ImGui.Button(ctx, 'Export') then
+      export_requested = true
+    end
+    if status then
+      ImGui.SameLine(ctx)
+      ImGui.TextWrapped(ctx, status)
+    end
+  end
+
+  local function frame()
+    local tracks = tracks_mod.snapshot()
+    local plan = selection.plan(tracks)
+    local warnings = {}
+    for _, w in ipairs(plan.mute_warnings) do
+      warnings[w.track.guid] = w
+    end
+
+    ImGui.SetNextWindowSize(ctx, 420, 480, ImGui.Cond_FirstUseEver)
+    local visible, open = ImGui.Begin(ctx, TITLE, true)
+    if visible then
+      local footer_h = ImGui.GetFrameHeightWithSpacing(ctx) * 5
+      if export.log_enabled() then
+        footer_h = footer_h + ImGui.GetTextLineHeightWithSpacing(ctx) + NOTES_HEIGHT
+      end
+      if ImGui.BeginChild(ctx, 'tracks', 0, -footer_h) then
+        if #tracks == 0 then
+          ImGui.TextDisabled(ctx, 'No tracks in this project.')
+        end
+        for _, t in ipairs(tracks) do
+          draw_track(t, warnings[t.guid])
+        end
+        ImGui.EndChild(ctx)
+      end
+      draw_footer(plan)
+      ImGui.End(ctx)
+    end
+
+    -- Render outside of Begin/End: it's modal and blocks for its whole duration.
+    if export_requested then
+      export_requested = false
+      local ok
+      ok, status = export.run(tracks, plan, notes)
+      if ok then
+        notes = '' -- like a commit message: one per export
+      end
+    end
+
+    if open then
+      reaper.defer(frame)
+    end
+  end
+
+  reaper.defer(frame)
+end
+
+return M
