@@ -134,7 +134,11 @@ Treat these as assumptions until someone confirms them by hand, and update this 
 - What `$track` produces for unnamed tracks (`selection.display_name` assumes "Track N").
 - How `RENDER_TARGETS` looks with a secondary render format on. `match_files` then gives up:
   nothing moves into `stems/` and the log writes `file: null`.
-- The ReaImGui 0.9 calls in `lib/ui.lua` (`BeginChild`/`EndChild` pairing especially).
+- ReaImGui UI has been exercised by the user on 7.33/macOS (track list, footer sizing,
+  export). Gotcha: `SetNextItemWidth(ctx, 0)` means *zero pixels*; use `-FLT_MIN`
+  (`ImGui.NumericLimits_Float()`) to fill to the right edge. Before using a new ImGui
+  function, confirm it exists in the installed `ReaImGui_Demo.lua` or the
+  `reaper_imgui-*.dylib` symbols (`APIdef_ImGui_<Name>`).
   ReaImGui wasn't installed on the dev machine when this was written.
 - Windows and Linux in general.
 

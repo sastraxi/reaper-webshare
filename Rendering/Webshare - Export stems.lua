@@ -1,11 +1,8 @@
 -- @description Webshare: Export stems
 -- @author sastraxi
--- @version 0.3.0
+-- @version 0.3.1
 -- @changelog
---   Shared export folder: set once at the top of the panel and it applies to every
---   project. Exports go to <folder>/<project name>/<date time>/. Leave it empty to keep
---   exporting next to each project. Browse uses REAPER's folder picker on newer REAPER
---   versions, or js_ReaScriptAPI's if it's installed.
+--   Fix: the export folder field was invisible when there was no Browse button.
 -- @link https://github.com/sastraxi/reaper-webshare
 -- @about
 --   # Webshare: Export stems

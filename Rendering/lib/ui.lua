@@ -65,6 +65,7 @@ function M.run()
   end
 
   local ctx = ImGui.CreateContext(TITLE)
+  local FLT_MIN = ImGui.NumericLimits_Float()
   local status
   local notes = ''
   -- Height of everything below the track list, measured on the previous frame, so the list
@@ -121,7 +122,9 @@ function M.run()
       end
     end
 
-    ImGui.SetNextItemWidth(ctx, -buttons_w)
+    -- Negative widths align to the right edge. An explicit 0 means zero pixels, not "default",
+    -- so with no buttons use -FLT_MIN (ImGui's idiom for "fill to the right edge").
+    ImGui.SetNextItemWidth(ctx, buttons_w > 0 and -buttons_w or -FLT_MIN)
     local _
     _, folder_buf = ImGui.InputTextWithHint(ctx, '##export_folder',
       'Not set: next to each project, in Exports/', folder_buf)
