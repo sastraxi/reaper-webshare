@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index version="1" name="webshare" commit="46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c">
+  <category name="Rendering">
+    <reapack name="webshare_Stem export.lua" type="script" desc="Stem export">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Export the time selection as individual stems plus one combined mix. Top-level tracks are exported by default; toggle any track in the panel. Optionally writes a Markdown export log (YAML front matter) next to the files. Requires ReaImGui (ReaTeam Extensions repository).\par}
+}
+]]></description>
+        <link rel="website">https://github.com/sastraxi/reaper-webshare</link>
+      </metadata>
+      <version name="0.1.0" author="sastraxi" time="2026-10-13T03:27:44Z">
+        <changelog><![CDATA[Initial release.]]></changelog>
+        <source main="main">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/webshare_Stem%20export.lua</source>
+        <source main="main" file="webshare_Export stems.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/webshare_Export%20stems.lua</source>
+        <source main="main" file="webshare_Toggle stem export for selected tracks.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/webshare_Toggle%20stem%20export%20for%20selected%20tracks.lua</source>
+        <source file="lib/changelog.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/changelog.lua</source>
+        <source file="lib/export.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/export.lua</source>
+        <source file="lib/layout.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/layout.lua</source>
+        <source file="lib/render.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/render.lua</source>
+        <source file="lib/selection.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/selection.lua</source>
+        <source file="lib/tracks.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/tracks.lua</source>
+        <source file="lib/ui.lua">https://github.com/sastraxi/reaper-webshare/raw/46b0d1c9eaf60d13ea6700636dd9a31ec01a0a1c/Rendering/lib/ui.lua</source>
+      </version>
+    </reapack>
+  </category>
+</index>
