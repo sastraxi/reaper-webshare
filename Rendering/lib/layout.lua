@@ -12,6 +12,20 @@ local M = {}
 
 M.STEMS_DIR = 'stems'
 
+-- Where an export goes. With an export folder set (a user preference shared by all
+-- projects), projects are told apart by name:
+--   <export folder>/<project name>/<timestamp>
+-- Without one, next to the project file:
+--   <project dir>/Exports/<project name>/<timestamp>
+function M.output_dir(export_folder, project_dir, project_name, timestamp, sep)
+  local folder = project_name:gsub('[\\/:*?"<>|]', '_')
+  if export_folder and export_folder ~= '' then
+    local root = export_folder:gsub('[/\\]+$', '')
+    return table.concat({ root, folder, timestamp }, sep)
+  end
+  return table.concat({ project_dir, 'Exports', folder, timestamp }, sep)
+end
+
 function M.basename(path)
   return path:match('[^/\\]+$') or path
 end

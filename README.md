@@ -95,18 +95,25 @@ To skip the action list next time, give it a toolbar button or keyboard shortcut
 
 ### 4. Export
 
-1. Make a **time selection**: drag across the timeline ruler at the top of the arrange
+1. **Choose an export folder** (optional, once). At the top of the window, click
+   **Browse...** and pick a folder, or type or paste a path. This is remembered for all
+   projects. Leave it empty to export next to each project file instead.
+2. Make a **time selection**: drag across the timeline ruler at the top of the arrange
    view so a range is highlighted. Only that range is exported.
-2. In the *Webshare: Export stems* window, check the ticks. Every top-level track is ticked by
+3. In the *Webshare: Export stems* window, check the ticks. Every top-level track is ticked by
    default; tick or untick any track to change that.
-3. Click **Export**. REAPER's render window appears briefly while it renders.
-4. The files are in a new folder next to your `.rpp` project file:
+4. Click **Export**. REAPER's render window appears briefly while it renders.
+5. The files are in a new folder:
    ```
-   Exports/<project name>/<date time>/
+   <export folder>/<project name>/<date time>/     (or <project folder>/Exports/<project name>/<date time>/)
      Master.wav          the combined mix
      stems/Drums.wav     one file per ticked track
      export.md           only if "Write export log" is ticked
    ```
+
+**No Browse button?** REAPER 7.33 has no built-in folder picker for scripts; newer
+versions do. Either type or paste the path, or install **js_ReaScriptAPI** (*Extensions →
+ReaPack → Browse packages...*, filter `js_ReaScriptAPI`) and restart REAPER.
 
 **Format:** the file format, sample rate, bit depth, dither and normalization come from
 REAPER's own **File → Render...** dialog. Set them there once; the export doesn't change them.
@@ -142,6 +149,8 @@ REAPER's own **File → Render...** dialog. Set them there once; the export does
 
 ## The panel
 
+- **Export folder** at the top is shared by every project. Hover over it to see where
+  exports will go.
 - **reset** appears next to tracks you've changed. It puts them back to the default
   (top-level ticked, nested unticked).
 - **(muted)** in orange means something inside that stem is muted, so the file may not
@@ -213,7 +222,7 @@ extra render time.
 
 The front matter is plain YAML, so a static site generator like
 [Eleventy](https://www.11ty.dev) can read it directly. For example, point a collection at
-`Exports/*/*/export.md`. The `file` paths in the log (`Master.wav`, `stems/Drums.wav`)
+`<export folder>/*/*/export.md`. The `file` paths in the log (`Master.wav`, `stems/Drums.wav`)
 are relative to the log and always use `/`, so they work directly as links.
 
 ## Development

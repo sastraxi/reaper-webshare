@@ -30,13 +30,6 @@ function M.project_name()
   return name
 end
 
--- Exports/<project>/<date time>/ next to the project file, so each project and each export
--- gets its own folder. (lib/layout.lua describes what goes inside.)
-function M.default_output_dir()
-  local sep = package.config:sub(1, 1)
-  local folder = M.project_name():gsub('[\\/:*?"<>|]', '_')
-  return table.concat({ M.project_dir(), 'Exports', folder, os.date('%Y-%m-%d %H%M%S') }, sep)
-end
 
 local function save_state(tracks)
   local s = { num = {}, str = {}, selected = {}, mainsend = {} }
@@ -101,7 +94,6 @@ function M.export(tracks, plan, out_dir)
   if #plan.stems == 0 then
     return false, 'No tracks are marked for export.'
   end
-  out_dir = out_dir or M.default_output_dir()
 
   local state = save_state(tracks)
   reaper.PreventUIRefresh(1)

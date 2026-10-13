@@ -39,4 +39,14 @@ test('unexpected target count (e.g. secondary format): no moves, no guesses', fu
   eq(next(l.stems), nil)
 end)
 
+test('output_dir: next to the project when no export folder is set', function()
+  eq(layout.output_dir('', '/p/Song', 'Song', '2026-10-12 233921', '/'), '/p/Song/Exports/Song/2026-10-12 233921')
+  eq(layout.output_dir(nil, '/p/Song', 'Song', 't', '/'), '/p/Song/Exports/Song/t')
+end)
+
+test('output_dir: shared export folder, one subfolder per project', function()
+  eq(layout.output_dir('/Volumes/Share/Exports/', '/p/Song', 'Song', 't', '/'), '/Volumes/Share/Exports/Song/t')
+  eq(layout.output_dir([[D:\Exports]], [[C:\p]], 'A/B: "C"', 't', '\\'), [[D:\Exports\A_B_ _C_\t]])
+end)
+
 h.finish()

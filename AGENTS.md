@@ -23,10 +23,17 @@ single render pass. It must run unchanged on Windows, macOS and Linux.
   setting `B_MAINSEND = 0`, never by muting.
 - **Mute is respected, files are always written.** Warn when a stem or any of its
   descendants is muted. Never warn about muted tracks that aren't rendered.
+- **Export folder:** a *user* preference shared by all projects, not stored per project.
+  It lives in `SetExtState('webshare', 'export_folder', …, persist)` and is edited at the
+  top of the panel (text field + Browse). When empty (the default), exports go next to the
+  project file instead. The folder picker is `GetUserFileName(3, …)` where available (it's
+  not in 7.33), else `JS_Dialog_BrowseForFolder` (js_ReaScriptAPI), else typing or
+  pasting only.
 - **Output layout:** one folder per project, one per export. The project is the top
-  level, and only the per-track files are called stems:
+  level, and only the per-track files are called stems (`layout.output_dir`):
   ```
-  <project dir>/Exports/<project name>/<YYYY-MM-DD HHMMSS>/
+  <export folder>/<project name>/<YYYY-MM-DD HHMMSS>/     (export folder set)
+  <project dir>/Exports/<project name>/<YYYY-MM-DD HHMMSS>/   (not set)
     export.md          (if the log is on)
     Master.<ext>       combined mix
     stems/<track>.<ext>
@@ -72,6 +79,8 @@ pattern, because REAPER runs each script with its own working directory and Lua 
 
 - Keep decision logic in the pure modules (`selection`, `layout`, `changelog`) and test it there.
   REAPER-facing modules should stay thin adapters.
+- No accidental globals (`tools/check-globals.sh`, also run in CI). A `local` declared
+  below a function that uses it is a global *inside* that function.
 - Code must run on Lua 5.4 (REAPER) *and* 5.5. For example, don't assign to `for` loop
   variables, which are constants in 5.5.
 - Anything that changes project state temporarily (render settings, selection,

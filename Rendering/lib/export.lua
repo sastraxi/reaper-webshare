@@ -9,6 +9,26 @@ local layout = require 'lib.layout'
 local M = {}
 
 local SECTION = 'webshare'
+local SEP = package.config:sub(1, 1)
+
+-- Shared export folder: a user preference (not per project), persisted in REAPER's
+-- reaper-extstate.ini. Empty = export next to each project.
+function M.export_folder()
+  return reaper.GetExtState(SECTION, 'export_folder')
+end
+
+function M.set_export_folder(path)
+  if path == nil or path == '' then
+    reaper.DeleteExtState(SECTION, 'export_folder', true)
+  else
+    reaper.SetExtState(SECTION, 'export_folder', path, true)
+  end
+end
+
+function M.output_dir()
+  return layout.output_dir(M.export_folder(), render.project_dir(), render.project_name(),
+    os.date('%Y-%m-%d %H%M%S'), SEP)
+end
 
 function M.log_enabled()
   local _, v = reaper.GetProjExtState(0, SECTION, 'write_log')
@@ -18,8 +38,6 @@ end
 function M.set_log_enabled(on)
   reaper.SetProjExtState(0, SECTION, 'write_log', on and '1' or '')
 end
-
-local SEP = package.config:sub(1, 1)
 
 -- format_timestr_pos modes. -1 (project default) would make the log depend on the ruler setting.
 local TIME_CLOCK = 0
@@ -67,11 +85,13 @@ local function write_log(result, files, plan, start, finish, notes)
   return true
 end
 
--- Shorten paths inside the project folder for display ("Exports/Song/2026-...").
+-- Shorten paths inside the export or project folder for display ("Song/2026-...").
 local function display_dir(dir)
-  local base = render.project_dir() .. SEP
-  if dir:sub(1, #base) == base then
-    return dir:sub(#base + 1)
+  for _, base in ipairs({ M.export_folder(), render.project_dir() }) do
+    base = base:gsub('[/\\]+$', '') .. SEP
+    if base ~= SEP and dir:sub(1, #base) == base then
+      return dir:sub(#base + 1)
+    end
   end
   return dir
 end
@@ -80,7 +100,7 @@ end
 function M.run(tracks, plan, notes, opts)
   opts = opts or {}
   local start, finish = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
-  local ok, result = render.export(tracks, plan, opts.out_dir)
+  local ok, result = render.export(tracks, plan, opts.out_dir or M.output_dir())
   if not ok then
     return false, result
   end

@@ -1,11 +1,11 @@
 -- @description Webshare: Export stems
 -- @author sastraxi
--- @version 0.2.0
+-- @version 0.3.0
 -- @changelog
---   Readable action names: "Webshare - Export stems" (panel), "Webshare - Export stems now
---   (no window)", "Webshare - Toggle selected tracks for export". Replaces the old
---   webshare_* actions; re-add any toolbar buttons or shortcuts you made for them.
---   Panel: no more stray scrollbar; time selection shown as clock time and bars.
+--   Shared export folder: set once at the top of the panel and it applies to every
+--   project. Exports go to <folder>/<project name>/<date time>/. Leave it empty to keep
+--   exporting next to each project. Browse uses REAPER's folder picker on newer REAPER
+--   versions, or js_ReaScriptAPI's if it's installed.
 -- @link https://github.com/sastraxi/reaper-webshare
 -- @about
 --   # Webshare: Export stems
@@ -22,7 +22,8 @@
 --   2. Run **Script: Webshare - Export stems.lua** to open the panel
 --   3. Make a time selection, check the ticks, click **Export**
 --
---   Files go to `Exports/<project>/<date time>/` next to the project file.
+--   Files go to `<export folder>/<project>/<date time>/`. Set the export folder at the top
+--   of the panel; if it's empty, they go to `Exports/` next to the project file.
 --   Full documentation: https://github.com/sastraxi/reaper-webshare
 -- @provides
 --   [main] Webshare - Export stems now (no window).lua

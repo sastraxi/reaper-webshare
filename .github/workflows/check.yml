@@ -10,6 +10,8 @@ jobs:
       run:  sudo apt-get update && sudo apt-get install -yy lua5.4
     - name: Syntax-check every script
       run:  find Rendering tests tools -name '*.lua' -print0 | xargs -0 -n1 luac5.4 -p
+    - name: Check for accidental globals
+      run:  tools/check-globals.sh luac5.4
     - name: Run tests
       run:  for t in tests/*_test.lua; do lua5.4 "$t" || exit 1; done
   reapack-index:

@@ -4,6 +4,7 @@
 local selection = require 'lib.selection'
 local tracks_mod = require 'lib.tracks'
 local export = require 'lib.export'
+local render = require 'lib.render'
 
 local M = {}
 
@@ -18,6 +19,22 @@ local function load_imgui()
   end
   package.path = reaper.ImGui_GetBuiltinPath() .. '/?.lua;' .. package.path
   return require 'imgui' '0.9'
+end
+
+-- Folder picker: REAPER's own (GetUserFileName mode 3, newer REAPER versions), else
+-- js_ReaScriptAPI's, else nil (the path can still be typed or pasted).
+local function folder_picker()
+  if reaper.GetUserFileName then
+    return function(initial)
+      local ok, path = reaper.GetUserFileName(3, 'Choose export folder', initial, '')
+      return ok and path or nil
+    end
+  elseif reaper.JS_Dialog_BrowseForFolder then
+    return function(initial)
+      local rv, path = reaper.JS_Dialog_BrowseForFolder('Choose export folder', initial)
+      return rv == 1 and path or nil
+    end
+  end
 end
 
 local function names(list)
@@ -53,6 +70,8 @@ function M.run()
   -- Height of everything below the track list, measured on the previous frame, so the list
   -- fills exactly the space left over. (Estimating it always left a stray scrollbar.)
   local footer_h
+  local pick_folder = folder_picker()
+  local folder_buf = export.export_folder()
   local export_requested = false
 
   local function draw_track(t, warning)
@@ -88,6 +107,54 @@ function M.run()
       ImGui.Unindent(ctx, t.depth * INDENT)
     end
     ImGui.PopID(ctx)
+  end
+
+  local function draw_header()
+    ImGui.Text(ctx, 'Export folder (all projects):')
+    local browse_w = pick_folder and ImGui.CalcTextSize(ctx, 'Browse...') + 16 or 0
+    local clear_w = folder_buf ~= '' and ImGui.CalcTextSize(ctx, 'Clear') + 16 or 0
+    local spacing_x = ImGui.GetStyleVar(ctx, ImGui.StyleVar_ItemSpacing)
+    local buttons_w = 0
+    for _, w in ipairs({ browse_w, clear_w }) do
+      if w > 0 then
+        buttons_w = buttons_w + w + spacing_x
+      end
+    end
+
+    ImGui.SetNextItemWidth(ctx, -buttons_w)
+    local _
+    _, folder_buf = ImGui.InputTextWithHint(ctx, '##export_folder',
+      'Not set: next to each project, in Exports/', folder_buf)
+    if ImGui.IsItemDeactivatedAfterEdit(ctx) then
+      export.set_export_folder(folder_buf)
+    end
+    if ImGui.IsItemHovered(ctx) then
+      local tip = 'Each export goes into <export folder>/<project name>/<date time>/.'
+      if not pick_folder then
+        tip = tip .. '\n\nType or paste a path. For a Browse button, update REAPER or install'
+          .. '\njs_ReaScriptAPI (ReaPack, ReaTeam Extensions).'
+      end
+      ImGui.SetTooltip(ctx, tip)
+    end
+
+    if pick_folder then
+      ImGui.SameLine(ctx)
+      if ImGui.Button(ctx, 'Browse...') then
+        local path = pick_folder(folder_buf ~= '' and folder_buf or render.project_dir())
+        if path and path ~= '' then
+          folder_buf = path
+          export.set_export_folder(path)
+        end
+      end
+    end
+    if folder_buf ~= '' then
+      ImGui.SameLine(ctx)
+      if ImGui.Button(ctx, 'Clear') then
+        folder_buf = ''
+        export.set_export_folder('')
+      end
+    end
+    ImGui.Separator(ctx)
   end
 
   local function draw_footer(plan)
@@ -141,6 +208,7 @@ function M.run()
     ImGui.SetNextWindowSize(ctx, 420, 480, ImGui.Cond_FirstUseEver)
     local visible, open = ImGui.Begin(ctx, TITLE, true)
     if visible then
+      draw_header()
       local _, avail_h = ImGui.GetContentRegionAvail(ctx)
       local min_h = ImGui.GetFrameHeightWithSpacing(ctx) * 2
       local list_h = math.max(min_h, avail_h - (footer_h or min_h * 4))
