@@ -3,6 +3,16 @@
 Export your time selection as a set of individual stems **plus** one combined mix, all in a
 single render. Works on Windows, macOS and Linux.
 
+**ReaPack repository URL:**
+
+```
+https://github.com/sastraxi/reaper-webshare/raw/main/index.xml
+```
+
+Already use ReaPack? Paste that into **Extensions → ReaPack → Import repositories...**,
+install **Stem export** and **ReaImGui**, and restart REAPER. New to ReaPack? Follow
+[Install](#install) below.
+
 - Every **top-level track** (not inside a folder) is exported by default. A folder exports
   as one stem containing everything inside it.
 - Tick or untick any track, including tracks nested inside folders, to change what's exported.
