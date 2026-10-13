@@ -26,9 +26,12 @@ single render pass. It must run unchanged on Windows, macOS and Linux.
 - **Export folder:** a *user* preference shared by all projects, not stored per project.
   It lives in `SetExtState('webshare', 'export_folder', …, persist)` and is edited at the
   top of the panel (text field + Browse). When empty (the default), exports go next to the
-  project file instead. The folder picker is `GetUserFileName(3, …)` where available (it's
-  not in 7.33), else `JS_Dialog_BrowseForFolder` (js_ReaScriptAPI), else typing or
-  pasting only.
+  project file instead. Browse uses `JS_Dialog_BrowseForFolder`. 7.33 has no native folder
+  picker; `GetUserFileName(3, …)` arrived in a later REAPER.
+- **Dependencies:** the panel requires **ReaImGui** and **js_ReaScriptAPI** (user decision).
+  `ui.lua`'s `DEPENDENCIES` table checks for them at startup and offers
+  `ReaPack_BrowsePackages(<name>)`. The headless actions need neither, so don't add checks
+  there.
 - **Output layout:** one folder per project, one per export. The project is the top
   level, and only the per-track files are called stems (`layout.output_dir`):
   ```
@@ -151,7 +154,8 @@ Treat these as assumptions until someone confirms them by hand, and update this 
   (`ImGui.NumericLimits_Float()`) to fill to the right edge. Before using a new ImGui
   function, confirm it exists in the installed `ReaImGui_Demo.lua` or the
   `reaper_imgui-*.dylib` symbols (`APIdef_ImGui_<Name>`).
-  ReaImGui wasn't installed on the dev machine when this was written.
+- The startup dependency prompt (0.4.0) hasn't been seen by the user yet, since both
+  extensions were already installed.
 - Windows and Linux in general.
 
 ## Testing
@@ -181,4 +185,4 @@ Treat these as assumptions until someone confirms them by hand, and update this 
   push and PR. Run it locally with Ruby ≥ 3 + `gem install reapack-index --pre` + pandoc;
   it needs the `origin` remote to build download URLs.
 - ReaPack can't declare dependencies and has no API to install packages. The panel checks
-  for ReaImGui at runtime and offers `ReaPack_BrowsePackages('ReaImGui')`.
+  for ReaImGui and js_ReaScriptAPI at runtime (see Dependencies above).

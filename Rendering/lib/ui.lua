@@ -21,19 +21,56 @@ local function load_imgui()
   return require 'imgui' '0.9'
 end
 
--- Folder picker: REAPER's own (GetUserFileName mode 3, newer REAPER versions), else
--- js_ReaScriptAPI's, else nil (the path can still be typed or pasted).
-local function folder_picker()
-  if reaper.GetUserFileName then
-    return function(initial)
-      local ok, path = reaper.GetUserFileName(3, 'Choose export folder', initial, '')
-      return ok and path or nil
+-- REAPER extensions the panel needs, all installed through ReaPack (ReaTeam Extensions).
+-- ReaPack can't declare dependencies, so we check at startup.
+local DEPENDENCIES = {
+  { name = 'ReaImGui', why = 'draws this window', present = function() return reaper.ImGui_GetBuiltinPath end },
+  { name = 'js_ReaScriptAPI', why = 'the export folder picker',
+    present = function() return reaper.JS_Dialog_BrowseForFolder end },
+}
+
+-- Returns true if everything is installed; otherwise explains what's missing and offers to
+-- open ReaPack's browser on it (the closest thing to installing it for the user).
+local function check_dependencies()
+  local missing = {}
+  for _, d in ipairs(DEPENDENCIES) do
+    if not d.present() then
+      missing[#missing + 1] = d
     end
-  elseif reaper.JS_Dialog_BrowseForFolder then
-    return function(initial)
-      local rv, path = reaper.JS_Dialog_BrowseForFolder('Choose export folder', initial)
-      return rv == 1 and path or nil
-    end
+  end
+  if #missing == 0 then
+    return true
+  end
+
+  local lines = {}
+  for i, d in ipairs(missing) do
+    lines[i] = ('  • %s (%s)'):format(d.name, d.why)
+  end
+  local msg = 'This script needs these REAPER extensions, which aren\'t installed:\n\n'
+    .. table.concat(lines, '\n') .. '\n\n'
+  if not reaper.ReaPack_BrowsePackages then
+    reaper.MB(msg .. 'They\'re installed through ReaPack. Install ReaPack from https://reapack.com '
+      .. 'first, then run this again.', TITLE, 0)
+    return false
+  end
+
+  -- ReaPack's browser takes a single filter, so open it on the first one.
+  local how = 'Open ReaPack to install it? Right-click it → Install, click OK, then restart REAPER.'
+  if #missing > 1 then
+    how = ('Open ReaPack to install them? It opens on %s: right-click it → Install. Then '
+      .. 'search for %s and do the same, click OK, and restart REAPER.')
+      :format(missing[1].name, missing[2].name)
+  end
+  if reaper.MB(msg .. how, TITLE, 4) == 6 then -- 4 = Yes/No, 6 = Yes
+    reaper.ReaPack_BrowsePackages(missing[1].name)
+  end
+  return false
+end
+
+local function browse_folder(initial)
+  local rv, path = reaper.JS_Dialog_BrowseForFolder('Choose export folder', initial)
+  if rv == 1 and path ~= '' then
+    return path
   end
 end
 
@@ -46,23 +83,10 @@ local function names(list)
 end
 
 function M.run()
-  local ImGui = load_imgui()
-  if not ImGui then
-    -- ReaPack can't declare dependencies or install from a script, but it can open its
-    -- browser pre-filtered so installing ReaImGui is one right-click away.
-    if reaper.ReaPack_BrowsePackages then
-      local answer = reaper.MB('This script needs ReaImGui, which isn\'t installed.\n\n'
-        .. 'Open ReaPack to install it? (Right-click it → Install, then OK, then restart REAPER.)',
-        TITLE, 4) -- 4 = Yes/No
-      if answer == 6 then -- 6 = Yes
-        reaper.ReaPack_BrowsePackages('ReaImGui')
-      end
-    else
-      reaper.MB('This script needs ReaImGui, which is installed through ReaPack.\n\n'
-        .. 'Install ReaPack from https://reapack.com first, then run this again.', TITLE, 0)
-    end
+  if not check_dependencies() then
     return
   end
+  local ImGui = load_imgui()
 
   local ctx = ImGui.CreateContext(TITLE)
   local FLT_MIN = ImGui.NumericLimits_Float()
@@ -71,7 +95,6 @@ function M.run()
   -- Height of everything below the track list, measured on the previous frame, so the list
   -- fills exactly the space left over. (Estimating it always left a stray scrollbar.)
   local footer_h
-  local pick_folder = folder_picker()
   local folder_buf = export.export_folder()
   local export_requested = false
 
@@ -112,7 +135,7 @@ function M.run()
 
   local function draw_header()
     ImGui.Text(ctx, 'Export folder (all projects):')
-    local browse_w = pick_folder and ImGui.CalcTextSize(ctx, 'Browse...') + 16 or 0
+    local browse_w = ImGui.CalcTextSize(ctx, 'Browse...') + 16
     local clear_w = folder_buf ~= '' and ImGui.CalcTextSize(ctx, 'Clear') + 16 or 0
     local spacing_x = ImGui.GetStyleVar(ctx, ImGui.StyleVar_ItemSpacing)
     local buttons_w = 0
@@ -132,22 +155,15 @@ function M.run()
       export.set_export_folder(folder_buf)
     end
     if ImGui.IsItemHovered(ctx) then
-      local tip = 'Each export goes into <export folder>/<project name>/<date time>/.'
-      if not pick_folder then
-        tip = tip .. '\n\nType or paste a path. For a Browse button, update REAPER or install'
-          .. '\njs_ReaScriptAPI (ReaPack, ReaTeam Extensions).'
-      end
-      ImGui.SetTooltip(ctx, tip)
+      ImGui.SetTooltip(ctx, 'Each export goes into <export folder>/<project name>/<date time>/.')
     end
 
-    if pick_folder then
-      ImGui.SameLine(ctx)
-      if ImGui.Button(ctx, 'Browse...') then
-        local path = pick_folder(folder_buf ~= '' and folder_buf or render.project_dir())
-        if path and path ~= '' then
-          folder_buf = path
-          export.set_export_folder(path)
-        end
+    ImGui.SameLine(ctx)
+    if ImGui.Button(ctx, 'Browse...') then
+      local path = browse_folder(folder_buf ~= '' and folder_buf or render.project_dir())
+      if path then
+        folder_buf = path
+        export.set_export_folder(path)
       end
     end
     if folder_buf ~= '' then

@@ -1,8 +1,9 @@
 -- @description Webshare: Export stems
 -- @author sastraxi
--- @version 0.3.1
+-- @version 0.4.0
 -- @changelog
---   Fix: the export folder field was invisible when there was no Browse button.
+--   The panel now requires js_ReaScriptAPI as well as ReaImGui (for the export folder
+--   picker). If either is missing, it offers to open ReaPack on it.
 -- @link https://github.com/sastraxi/reaper-webshare
 -- @about
 --   # Webshare: Export stems
@@ -11,7 +12,8 @@
 --   Top-level tracks are exported by default; toggle any track in the panel.
 --   Optionally writes a Markdown export log (YAML front matter) next to the files.
 --
---   **Requires ReaImGui** (ReaTeam Extensions repository). Restart REAPER after installing it.
+--   **Requires ReaImGui and js_ReaScriptAPI** (both in the ReaTeam Extensions repository).
+--   Restart REAPER after installing them.
 --
 --   ## How to use
 --

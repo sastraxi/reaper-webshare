@@ -10,7 +10,7 @@ https://github.com/sastraxi/reaper-webshare/raw/main/index.xml
 ```
 
 Already use ReaPack? Paste that into **Extensions → ReaPack → Import repositories...**,
-install **Webshare: Export stems** and **ReaImGui** from *Browse packages*, and restart REAPER. Then
+install **Webshare: Export stems**, **ReaImGui** and **js_ReaScriptAPI** from *Browse packages*, and restart REAPER. Then
 run **Script: Webshare - Export stems.lua** from **Actions → Show action list...**. New to
 ReaPack? Follow [Install](#install) below.
 
@@ -66,10 +66,15 @@ skip to step 2.
    ```
 3. **Extensions → ReaPack → Browse packages...**, type `webshare` in the *Filter* box,
    right-click **Webshare: Export stems** → **Install v…**.
-4. In the same window, clear the filter and type `ReaImGui`. If its status column is empty
-   (not installed), right-click **ReaImGui: ReaScript binding for Dear ImGui** →
-   **Install v…**. ReaImGui draws the panel; ReaPack can't install it for us automatically.
-5. Click **OK** to download, then **quit and reopen REAPER**. Extensions like ReaImGui
+4. Install the two extensions the panel needs, unless you already have them (an empty
+   status column means not installed). ReaPack can't install them for us automatically. In
+   the same window:
+   - clear the filter, type `ReaImGui`, right-click
+     **ReaImGui: ReaScript binding for Dear ImGui** → **Install v…**. It draws the panel.
+   - clear the filter, type `js_ReaScriptAPI`, right-click
+     **js_ReaScriptAPI: API functions for ReaScripts** → **Install v…**. It provides the
+     folder picker.
+5. Click **OK** to download, then **quit and reopen REAPER**. Extensions like these
    only load at startup.
 
 Nothing appears in REAPER's menus after installing. A script package adds **actions**
@@ -111,10 +116,6 @@ To skip the action list next time, give it a toolbar button or keyboard shortcut
      export.md           only if "Write export log" is ticked
    ```
 
-**No Browse button?** REAPER 7.33 has no built-in folder picker for scripts; newer
-versions do. Either type or paste the path, or install **js_ReaScriptAPI** (*Extensions →
-ReaPack → Browse packages...*, filter `js_ReaScriptAPI`) and restart REAPER.
-
 **Format:** the file format, sample rate, bit depth, dither and normalization come from
 REAPER's own **File → Render...** dialog. Set them there once; the export doesn't change them.
 
@@ -140,7 +141,7 @@ REAPER's own **File → Render...** dialog. Set them there once; the export does
 
 | What you see | What to do |
 |---|---|
-| *"This script needs ReaImGui"* | Click **Yes** to open ReaPack on ReaImGui, install it, then restart REAPER. |
+| *"This script needs these REAPER extensions"* | Click **Yes** to open ReaPack on the first missing one, install it (and the other, if two are listed), click **OK**, then restart REAPER. *Export stems now (no window)* works without them. |
 | **Webshare: Export stems** isn't in *Browse packages* | Check the repository was imported (*Extensions → ReaPack → Manage repositories...* should list **webshare**), then *Synchronize packages*. |
 | No **Extensions** menu | ReaPack isn't loaded. Check the file is in `UserPlugins` (not a subfolder) and matches your REAPER build (arm64 vs x86_64), then restart. |
 | *"Make a time selection first."* | Drag across the timeline ruler so a range is highlighted, then export again. |
