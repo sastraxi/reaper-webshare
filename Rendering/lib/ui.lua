@@ -7,7 +7,7 @@ local export = require 'lib.export'
 
 local M = {}
 
-local TITLE = 'Stem Export'
+local TITLE = 'Webshare: Export stems'
 local INDENT = 16
 local COLOR_WARN = 0xF0A030FF
 local NOTES_HEIGHT = 64
@@ -50,6 +50,9 @@ function M.run()
   local ctx = ImGui.CreateContext(TITLE)
   local status
   local notes = ''
+  -- Height of everything below the track list, measured on the previous frame, so the list
+  -- fills exactly the space left over. (Estimating it always left a stray scrollbar.)
+  local footer_h
   local export_requested = false
 
   local function draw_track(t, warning)
@@ -92,8 +95,9 @@ function M.run()
 
     local start, finish = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
     if finish > start then
-      ImGui.Text(ctx, ('Time selection: %s – %s'):format(
-        reaper.format_timestr_pos(start, '', -1), reaper.format_timestr_pos(finish, '', -1)))
+      ImGui.Text(ctx, ('Time selection: %s – %s  (bars %s – %s)'):format(
+        reaper.format_timestr_pos(start, '', 0), reaper.format_timestr_pos(finish, '', 0),
+        reaper.format_timestr_pos(start, '', 2), reaper.format_timestr_pos(finish, '', 2)))
     else
       ImGui.TextColored(ctx, COLOR_WARN, 'No time selection')
     end
@@ -137,11 +141,11 @@ function M.run()
     ImGui.SetNextWindowSize(ctx, 420, 480, ImGui.Cond_FirstUseEver)
     local visible, open = ImGui.Begin(ctx, TITLE, true)
     if visible then
-      local footer_h = ImGui.GetFrameHeightWithSpacing(ctx) * 5
-      if export.log_enabled() then
-        footer_h = footer_h + ImGui.GetTextLineHeightWithSpacing(ctx) + NOTES_HEIGHT
-      end
-      if ImGui.BeginChild(ctx, 'tracks', 0, -footer_h) then
+      local _, avail_h = ImGui.GetContentRegionAvail(ctx)
+      local min_h = ImGui.GetFrameHeightWithSpacing(ctx) * 2
+      local list_h = math.max(min_h, avail_h - (footer_h or min_h * 4))
+      local top = ImGui.GetCursorPosY(ctx)
+      if ImGui.BeginChild(ctx, 'tracks', 0, list_h) then
         if #tracks == 0 then
           ImGui.TextDisabled(ctx, 'No tracks in this project.')
         end
@@ -151,6 +155,9 @@ function M.run()
         ImGui.EndChild(ctx)
       end
       draw_footer(plan)
+      -- The cursor sits one item-spacing below the last widget; that gap isn't content.
+      local _, spacing_y = ImGui.GetStyleVar(ctx, ImGui.StyleVar_ItemSpacing)
+      footer_h = ImGui.GetCursorPosY(ctx) - spacing_y - top - list_h
       ImGui.End(ctx)
     end
 

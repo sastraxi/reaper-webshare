@@ -1,4 +1,4 @@
-# Stem Export for REAPER
+# Webshare: Export stems (for REAPER)
 
 Export your time selection as a set of individual stems **plus** one combined mix, all in a
 single render. Works on Windows, macOS and Linux.
@@ -10,8 +10,8 @@ https://github.com/sastraxi/reaper-webshare/raw/main/index.xml
 ```
 
 Already use ReaPack? Paste that into **Extensions → ReaPack → Import repositories...**,
-install **Stem export** and **ReaImGui** from *Browse packages*, and restart REAPER. Then
-run **Script: webshare_Stem export.lua** from **Actions → Show action list...**. New to
+install **Webshare: Export stems** and **ReaImGui** from *Browse packages*, and restart REAPER. Then
+run **Script: Webshare - Export stems.lua** from **Actions → Show action list...**. New to
 ReaPack? Follow [Install](#install) below.
 
 - Every **top-level track** (not inside a folder) is exported by default. A folder exports
@@ -64,8 +64,8 @@ skip to step 2.
    ```
    https://github.com/sastraxi/reaper-webshare/raw/main/index.xml
    ```
-3. **Extensions → ReaPack → Browse packages...**, type `Stem export` in the *Filter* box,
-   right-click **Stem export** → **Install v…**.
+3. **Extensions → ReaPack → Browse packages...**, type `webshare` in the *Filter* box,
+   right-click **Webshare: Export stems** → **Install v…**.
 4. In the same window, clear the filter and type `ReaImGui`. If its status column is empty
    (not installed), right-click **ReaImGui: ReaScript binding for Dear ImGui** →
    **Install v…**. ReaImGui draws the panel; ReaPack can't install it for us automatically.
@@ -78,13 +78,17 @@ Nothing appears in REAPER's menus after installing. A script package adds **acti
 ### 3. Open the panel
 
 1. In REAPER's menu bar choose **Actions → Show action list...** (shortcut: **?**).
-2. In the **Filter** box at the top, type `stem`. You'll see three actions:
-   - **Script: webshare_Stem export.lua**: opens the panel. This is the main one.
-   - **Script: webshare_Export stems.lua**: exports straight away, without the panel.
-   - **Script: webshare_Toggle stem export for selected tracks.lua**: ticks or unticks
-     the selected tracks.
-3. Click **Script: webshare_Stem export.lua**, then click **Run** at the bottom right.
-   The *Stem Export* window opens, listing your tracks.
+2. In the **Filter** box at the top, type `webshare`. You'll see three actions:
+   - **Script: Webshare - Export stems.lua**: opens the panel. This is the main one.
+   - **Script: Webshare - Export stems now (no window).lua**: exports straight away
+     with the current ticks. Handy on a toolbar button once your ticks are set up.
+   - **Script: Webshare - Toggle selected tracks for export.lua**: ticks or unticks the
+     selected tracks. Handy in the track right-click menu.
+3. Click **Script: Webshare - Export stems.lua**, then click **Run** at the bottom right.
+   The *Webshare: Export stems* window opens, listing your tracks.
+
+REAPER always shows scripts as `Script: <file name>.lua`; scripts can't choose a
+prettier action name.
 
 To skip the action list next time, give it a toolbar button or keyboard shortcut (see
 [Making it quicker to reach](#making-it-quicker-to-reach-optional)).
@@ -93,7 +97,7 @@ To skip the action list next time, give it a toolbar button or keyboard shortcut
 
 1. Make a **time selection**: drag across the timeline ruler at the top of the arrange
    view so a range is highlighted. Only that range is exported.
-2. In the *Stem Export* window, check the ticks. Every top-level track is ticked by
+2. In the *Webshare: Export stems* window, check the ticks. Every top-level track is ticked by
    default; tick or untick any track to change that.
 3. Click **Export**. REAPER's render window appears briefly while it renders.
 4. The files are in a new folder next to your `.rpp` project file:
@@ -115,13 +119,13 @@ REAPER's own **File → Render...** dialog. Set them there once; the export does
   *Shortcuts for selected action*, and press the key combination you want.
 - **Track right-click menu:** **Options → Customize menus/toolbars...** → choose
   **Track control panel context** from the dropdown → **Add...** → choose
-  *webshare_Toggle stem export for selected tracks.lua*.
+  *Webshare - Toggle selected tracks for export.lua*.
 
 ### Updating and removing
 
 - **Update:** **Extensions → ReaPack → Synchronize packages** (ReaPack also does this on
   its own schedule).
-- **Remove:** **Extensions → ReaPack → Browse packages...**, right-click **Stem export** →
+- **Remove:** **Extensions → ReaPack → Browse packages...**, right-click **Webshare: Export stems** →
   **Uninstall**, then **OK**. Projects keep their tick choices in the `.rpp`; without the
   scripts installed, those choices just do nothing.
 
@@ -130,10 +134,10 @@ REAPER's own **File → Render...** dialog. Set them there once; the export does
 | What you see | What to do |
 |---|---|
 | *"This script needs ReaImGui"* | Click **Yes** to open ReaPack on ReaImGui, install it, then restart REAPER. |
-| **Stem export** isn't in *Browse packages* | Check the repository was imported (*Extensions → ReaPack → Manage repositories...* should list **webshare**), then *Synchronize packages*. |
+| **Webshare: Export stems** isn't in *Browse packages* | Check the repository was imported (*Extensions → ReaPack → Manage repositories...* should list **webshare**), then *Synchronize packages*. |
 | No **Extensions** menu | ReaPack isn't loaded. Check the file is in `UserPlugins` (not a subfolder) and matches your REAPER build (arm64 vs x86_64), then restart. |
 | *"Make a time selection first."* | Drag across the timeline ruler so a range is highlighted, then export again. |
-| I installed it but can't find it anywhere | It doesn't add a menu. Use **Actions → Show action list...**, filter `stem` (see [Open the panel](#3-open-the-panel)). |
+| I installed it but can't find it anywhere | It doesn't add a menu. Use **Actions → Show action list...**, filter `webshare` (see [Open the panel](#3-open-the-panel)). |
 | *"Render was cancelled or failed"* | You (or REAPER) stopped the render. No files were written, so just export again. |
 
 ## The panel
@@ -217,7 +221,7 @@ are relative to the log and always use `/`, so they work directly as links.
 To run your working copy instead of the ReaPack release:
 
 1. **Actions → Show action list... → New action... → Load ReaScript...**
-2. Select the three `webshare_*.lua` files in this repo's `Rendering/` folder (Cmd-/Ctrl-click).
+2. Select the three `Webshare - *.lua` files in this repo's `Rendering/` folder (Cmd-/Ctrl-click).
    In the macOS file dialog, **Cmd-Shift-G** lets you paste a path.
 
 Edits are picked up the next time an action runs. If the ReaPack version is installed
@@ -230,7 +234,7 @@ portable installs, set `REAPER_RESOURCE_PATH` first.
 
 ### Releasing
 
-1. Bump `@version` (and write `@changelog`) in `Rendering/webshare_Stem export.lua`.
+1. Bump `@version` (and write `@changelog`) in `Rendering/Webshare - Export stems.lua`.
 2. Push to `main`. The **deploy** workflow runs `reapack-index`, which adds the new version
    to `index.xml` and commits it. ReaPack users get it on their next sync.
 

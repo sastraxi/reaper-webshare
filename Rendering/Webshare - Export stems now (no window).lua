@@ -12,6 +12,6 @@ local tracks = tracks_mod.snapshot()
 local plan = selection.plan(tracks)
 local ok, result = export.run(tracks, plan, '')
 if not ok then
-  reaper.MB(result, 'Stem export', 0)
+  reaper.MB(result, 'Webshare: Export stems', 0)
 end
 reaper.defer(function() end) -- no undo point

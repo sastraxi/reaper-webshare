@@ -67,6 +67,15 @@ local function write_log(result, files, plan, start, finish, notes)
   return true
 end
 
+-- Shorten paths inside the project folder for display ("Exports/Song/2026-...").
+local function display_dir(dir)
+  local base = render.project_dir() .. SEP
+  if dir:sub(1, #base) == base then
+    return dir:sub(#base + 1)
+  end
+  return dir
+end
+
 -- Returns ok, message for the user. opts (optional, for dev tools): out_dir, write_log.
 function M.run(tracks, plan, notes, opts)
   opts = opts or {}
@@ -85,7 +94,7 @@ function M.run(tracks, plan, notes, opts)
   local files = layout.plan(plan, result.targets, result.dir, SEP)
   local moved, move_err = apply_moves(result.dir, files.moves)
   if not moved then
-    return false, 'Exported to ' .. result.dir .. ', but moving stems into '
+    return false, 'Exported to ' .. display_dir(result.dir) .. ', but moving stems into '
       .. layout.STEMS_DIR .. '/ failed: ' .. tostring(move_err)
   end
 
@@ -96,10 +105,10 @@ function M.run(tracks, plan, notes, opts)
   if log then
     local logged, err = write_log(result, files, plan, start, finish, notes)
     if not logged then
-      return false, 'Exported to ' .. result.dir .. ', but writing the log failed: ' .. tostring(err)
+      return false, 'Exported to ' .. display_dir(result.dir) .. ', but writing the log failed: ' .. tostring(err)
     end
   end
-  return true, 'Exported to ' .. result.dir
+  return true, 'Exported to ' .. display_dir(result.dir)
 end
 
 return M

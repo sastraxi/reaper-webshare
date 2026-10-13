@@ -44,9 +44,9 @@ single render pass. It must run unchanged on Windows, macOS and Linux.
 
 ```
 Rendering/            ReaPack category folder (the name shows up in ReaPack and in install paths)
-  webshare_Stem export.lua                           ReaPack package file + panel action
-  webshare_Export stems.lua                          headless export action
-  webshare_Toggle stem export for selected tracks.lua
+  Webshare - Export stems.lua                        ReaPack package file + panel action
+  Webshare - Export stems now (no window).lua        headless export action
+  Webshare - Toggle selected tracks for export.lua
   lib/selection.lua   pure logic: defaults, overrides, plan, warnings. NO reaper.* calls
   lib/layout.lua      pure logic: match render targets to tracks, plan moves into stems/
   lib/changelog.lua   pure logic: RENDER_STATS parsing, export.md generation. NO reaper.*
@@ -64,6 +64,11 @@ Entry scripts put their own directory on `package.path` and `require 'lib.x'`. K
 pattern, because REAPER runs each script with its own working directory and Lua state.
 
 ## Conventions
+
+- Action names come from file names: REAPER shows `Script: <file>.lua`, and there's no
+  API for a script to set its own name. Keep entry scripts named `Webshare - <Verb ...>.lua`.
+  No `:` (invalid on Windows). Renaming the package file creates a new ReaPack package,
+  and the old one shows as obsolete for existing users, so avoid it after 1.0.
 
 - Keep decision logic in the pure modules (`selection`, `layout`, `changelog`) and test it there.
   REAPER-facing modules should stay thin adapters.
@@ -140,7 +145,7 @@ Treat these as assumptions until someone confirms them by hand, and update this 
 - Published at `https://github.com/sastraxi/reaper-webshare/raw/main/index.xml`. The ReaPack
   repository name is `webshare` (`.reapack-index.conf`), so installs land in
   `<resource>/Scripts/webshare/Rendering/`.
-- The package file is `Rendering/webshare_Stem export.lua`, and its header holds
+- The package file is `Rendering/Webshare - Export stems.lua`, and its header holds
   `@version`, `@changelog` and `@provides`. Every other `.lua` under `Rendering/` must
   start with `-- @noindex`, or reapack-index treats it as a separate package. `tests/`,
   `tools/` and `out/` are ignored via `.reapack-index.conf`.

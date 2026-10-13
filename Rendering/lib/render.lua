@@ -16,7 +16,7 @@ local BOUNDS_TIME_SELECTION = 2
 local NUM_KEYS = { 'RENDER_SETTINGS', 'RENDER_BOUNDSFLAG', 'RENDER_ADDTOPROJ' }
 local STR_KEYS = { 'RENDER_FILE', 'RENDER_PATTERN' }
 
-local function project_dir()
+function M.project_dir()
   local _, path = reaper.EnumProjects(-1)
   local dir = path and path:match('^(.*)[/\\]')
   return dir or reaper.GetProjectPath()
@@ -35,7 +35,7 @@ end
 function M.default_output_dir()
   local sep = package.config:sub(1, 1)
   local folder = M.project_name():gsub('[\\/:*?"<>|]', '_')
-  return table.concat({ project_dir(), 'Exports', folder, os.date('%Y-%m-%d %H%M%S') }, sep)
+  return table.concat({ M.project_dir(), 'Exports', folder, os.date('%Y-%m-%d %H%M%S') }, sep)
 end
 
 local function save_state(tracks)
