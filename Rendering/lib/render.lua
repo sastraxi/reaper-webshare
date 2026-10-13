@@ -1,3 +1,4 @@
+-- @noindex
 -- Single-pass render: stems (pre-master-FX) + combined master mix, over the time selection.
 -- Temporarily changes render settings, track selection and master sends, and always restores them.
 

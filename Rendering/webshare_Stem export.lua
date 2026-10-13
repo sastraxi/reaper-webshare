@@ -1,6 +1,9 @@
 -- @description Stem export
 -- @author sastraxi
 -- @version 0.1.0
+-- @changelog
+--   Initial release.
+-- @link https://github.com/sastraxi/reaper-webshare
 -- @about
 --   Export the time selection as individual stems plus one combined mix.
 --   Top-level tracks are exported by default; toggle any track in the panel.

@@ -1,3 +1,4 @@
+-- @noindex
 -- Builds the export log: Markdown with YAML front matter (readable by Eleventy and friends).
 -- Pure Lua, no reaper.* calls, so it can be tested outside REAPER.
 

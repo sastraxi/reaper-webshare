@@ -1,0 +1,29 @@
+name: check
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch repository
+      uses: actions/checkout@v4
+    - name: Install Lua 5.4 (REAPER's version)
+      run:  sudo apt-get update && sudo apt-get install -yy lua5.4
+    - name: Syntax-check every script
+      run:  find Rendering tests tools -name '*.lua' -print0 | xargs -0 -n1 luac5.4 -p
+    - name: Run tests
+      run:  for t in tests/*_test.lua; do lua5.4 "$t" || exit 1; done
+  reapack-index:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch repository
+      uses: actions/checkout@v4
+    - name: Install Pandoc
+      run:  sudo apt-get update && sudo apt-get install -yy pandoc
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2
+    - name: Install reapack-index
+      run:  gem install reapack-index --pre
+    - name: Validate packages
+      run:  reapack-index --check

@@ -1,3 +1,4 @@
+-- @noindex
 -- Runs an export and, if enabled for this project, writes the Markdown export log next to it.
 -- Shared by the panel and the headless action.
 

@@ -43,7 +43,7 @@ single render pass. It must run unchanged on Windows, macOS and Linux.
 ## Layout
 
 ```
-Scripts/webshare/
+Rendering/            ReaPack category folder (the name shows up in ReaPack and in install paths)
   webshare_Stem export.lua                           ReaPack package file + panel action
   webshare_Export stems.lua                          headless export action
   webshare_Toggle stem export for selected tracks.lua
@@ -55,7 +55,7 @@ Scripts/webshare/
   lib/export.lua      render, move stems, optional log; the entry point both actions use
   lib/ui.lua          ReaImGui panel (API pinned via require 'imgui' '0.9')
 tests/*_test.lua           plain-Lua tests for the pure modules (tests/harness.lua)
-tools/dev-link.{sh,ps1}    link Scripts/webshare into REAPER's resource folder
+tools/dev-link.{sh,ps1}    link Rendering/ into REAPER's Scripts/webshare-dev/
 tools/probe_render.lua     run inside REAPER: real export into out/ + probe.log of what
                            REAPER reported. Use it to check assumptions against a real install
 ```
@@ -128,14 +128,27 @@ Treat these as assumptions until someone confirms them by hand, and update this 
 
 - From the repo root: `for t in tests/*_test.lua; do lua "$t"; done`. Run them with Lua 5.4
   (REAPER's version: `brew install lua@5.4`, keg-only at `$(brew --prefix lua@5.4)/bin/lua`)
-  as well as current Lua. Optional lint: `luacheck Scripts tests tools`.
-- Everything else needs REAPER. Run `tools/dev-link.sh` once, load the actions through
-  *Actions → New action → Load ReaScript*, then test against a real project. You can't
+  as well as current Lua. Optional lint: `luacheck Rendering tests tools`.
+- Everything else needs REAPER. Load the actions straight from the clone (README → Install,
+  step 4), or have the user run `tools/probe_render.lua`, then test against a real project.
+  Menu labels in the README were checked against the 7.33 binary (`strings`), so check new
+  instructions the same way rather than writing them from memory. You can't
   drive REAPER from here, so state clearly what you couldn't verify.
 
-## Releasing
+## Releasing (ReaPack via GitHub Actions)
 
-ReaPack reads the metadata header in `webshare_Stem export.lua`. Bump `@version` there and
-generate `index.xml` with `reapack-index` (Ruby gem). The other scripts are `@noindex` and
-ship through its `@provides` list. ReaPack can't declare dependencies, so the panel checks
-for ReaImGui at runtime.
+- Published at `https://github.com/sastraxi/reaper-webshare/raw/main/index.xml`. The ReaPack
+  repository name is `webshare` (`.reapack-index.conf`), so installs land in
+  `<resource>/Scripts/webshare/Rendering/`.
+- The package file is `Rendering/webshare_Stem export.lua`, and its header holds
+  `@version`, `@changelog` and `@provides`. Every other `.lua` under `Rendering/` must
+  start with `-- @noindex`, or reapack-index treats it as a separate package. `tests/`,
+  `tools/` and `out/` are ignored via `.reapack-index.conf`.
+- To release, bump `@version`, write `@changelog`, and push to `main`. `deploy.yml` runs
+  `reapack-index --commit`, which scans commits since the one recorded in `index.xml` and
+  commits the updated index back. Never edit `index.xml` by hand.
+- `check.yml` runs the Lua 5.4 tests, `luac -p`, and `reapack-index --check` on every
+  push and PR. Run it locally with Ruby ≥ 3 + `gem install reapack-index --pre` + pandoc;
+  it needs the `origin` remote to build download URLs.
+- ReaPack can't declare dependencies and has no API to install packages. The panel checks
+  for ReaImGui at runtime and offers `ReaPack_BrowsePackages('ReaImGui')`.

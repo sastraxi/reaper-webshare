@@ -1,3 +1,4 @@
+-- @noindex
 -- Decides the on-disk layout of an export. Pure Lua, no reaper.* calls.
 --
 --   <export dir>/

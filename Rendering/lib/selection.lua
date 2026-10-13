@@ -1,3 +1,4 @@
+-- @noindex
 -- Pure export-planning logic over a track snapshot.
 -- No reaper.* calls in this file, so it can be tested with plain Lua (see tests/).
 --

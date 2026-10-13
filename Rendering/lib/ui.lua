@@ -1,3 +1,4 @@
+-- @noindex
 -- Dockable ReaImGui panel: track tree with export checkboxes, mute warnings, Export button.
 
 local selection = require 'lib.selection'
@@ -30,7 +31,19 @@ end
 function M.run()
   local ImGui = load_imgui()
   if not ImGui then
-    reaper.MB('This script needs ReaImGui. Install it with ReaPack (ReaTeam Extensions repository).', TITLE, 0)
+    -- ReaPack can't declare dependencies or install from a script, but it can open its
+    -- browser pre-filtered so installing ReaImGui is one right-click away.
+    if reaper.ReaPack_BrowsePackages then
+      local answer = reaper.MB('This script needs ReaImGui, which isn\'t installed.\n\n'
+        .. 'Open ReaPack to install it? (Right-click it → Install, then OK, then restart REAPER.)',
+        TITLE, 4) -- 4 = Yes/No
+      if answer == 6 then -- 6 = Yes
+        reaper.ReaPack_BrowsePackages('ReaImGui')
+      end
+    else
+      reaper.MB('This script needs ReaImGui, which is installed through ReaPack.\n\n'
+        .. 'Install ReaPack from https://reapack.com first, then run this again.', TITLE, 0)
+    end
     return
   end
 

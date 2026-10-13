@@ -1,5 +1,5 @@
 -- Run from the repo root: lua tests/selection_test.lua
-package.path = 'Scripts/webshare/?.lua;' .. package.path
+package.path = 'Rendering/?.lua;' .. package.path
 local selection = require 'lib.selection'
 
 local h = dofile('tests/harness.lua')

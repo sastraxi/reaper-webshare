@@ -5,7 +5,7 @@
 local sep = package.config:sub(1, 1)
 local tools_dir = debug.getinfo(1, 'S').source:match('^@?(.*[/\\])')
 local repo = tools_dir:gsub('[/\\]tools[/\\]$', '')
-package.path = repo .. sep .. 'Scripts' .. sep .. 'webshare' .. sep .. '?.lua;' .. package.path
+package.path = repo .. sep .. 'Rendering' .. sep .. '?.lua;' .. package.path
 
 local selection = require 'lib.selection'
 local tracks_mod = require 'lib.tracks'

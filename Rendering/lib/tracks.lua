@@ -1,3 +1,4 @@
+-- @noindex
 -- Adapter between the REAPER project and the plain snapshots used by lib/selection.lua.
 
 local selection = require 'lib.selection'
