@@ -128,6 +128,15 @@ REAPER 7.82. The user develops on **7.33**, so check that any newer flag exists 
 - `RENDER_STATS` still holds the *previous* render's stats until a new render finishes.
   This is harmless because each export goes into a new folder and stats are looked up by path.
 
+## Known upstream issues
+
+- **ReaImGui docking (confirmed by the user on 7.33/macOS, 2026-10-12):** dragging a
+  ReaImGui window onto an *empty* REAPER docker makes it flicker between 0 px and its old
+  height, and releasing doesn't dock. ReaImGui's own demo does the same, so it isn't our
+  code. Workaround: drop onto an already-open docker. A possible in-app fix is a
+  Dock/Undock control using `SetNextWindowDockID(ctx, -n)` (negative = REAPER docker n),
+  which avoids dragging; it hasn't been built yet.
+
 ## Not yet verified inside REAPER
 
 Treat these as assumptions until someone confirms them by hand, and update this list:

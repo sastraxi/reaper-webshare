@@ -145,6 +145,7 @@ REAPER's own **File → Render...** dialog. Set them there once; the export does
 | No **Extensions** menu | ReaPack isn't loaded. Check the file is in `UserPlugins` (not a subfolder) and matches your REAPER build (arm64 vs x86_64), then restart. |
 | *"Make a time selection first."* | Drag across the timeline ruler so a range is highlighted, then export again. |
 | I installed it but can't find it anywhere | It doesn't add a menu. Use **Actions → Show action list...**, filter `webshare` (see [Open the panel](#3-open-the-panel)). |
+| Dragging the window to a REAPER docker makes the docker flicker and it won't dock | A ReaImGui bug with empty (collapsed) dockers. Drag it onto a docker that's already open, e.g. one holding the Mixer, instead. |
 | *"Render was cancelled or failed"* | You (or REAPER) stopped the render. No files were written, so just export again. |
 
 ## The panel
