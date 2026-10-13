@@ -128,6 +128,9 @@ REAPER 7.82. The user develops on **7.33**, so check that any newer flag exists 
 - `RENDER_STATS` still holds the *previous* render's stats until a new render finishes.
   This is harmless because each export goes into a new folder and stats are looked up by path.
 
+- Shared export folder end-to-end with the js_ReaScriptAPI folder picker (user, 7.33/macOS,
+  2026-10-12): export into a Google Drive folder, with the stems moved and the log written there.
+
 ## Known upstream issues
 
 - **ReaImGui docking (confirmed by the user on 7.33/macOS, 2026-10-12):** dragging a
